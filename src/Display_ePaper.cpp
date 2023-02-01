@@ -95,7 +95,7 @@ void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDa
     do
     {
         _display->fillScreen(GxEPD_WHITE);
-        _display->setCursor(10, actualP_tbh - 10);
+        _display->setCursor(10, 65);
         if (_totalPower > 9999)
         {
             snprintf(_fmtText, sizeof(_fmtText), "%.1f kW", (_totalPower / 10000));
