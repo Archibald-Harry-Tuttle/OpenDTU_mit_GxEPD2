@@ -4,41 +4,41 @@
 
 #include <Hoymiles.h>
 
-void DisplayClass::init(DisplayType_t type, uint8_t _data, uint8_t _clk, uint8_t _cs, uint8_t _dc, uint8_t _reset, uint8_t _busy)
+void DisplayClass::init(DisplayType_t _type, uint8_t MOSI_PIN, uint8_t CLK_PIN, uint8_t CS_PIN, uint8_t DC_PIN, uint8_t RST_PIN, uint8_t BUSY_PIN)
 {
-    type = ePaper154;
-    _cs = 33;
-    _dc = 27;
-    _reset = 34;
-    _busy = 14;
-    _clk = 25;
-    _data = 32;
+    /*************** HSPI Belegung:
+    MISO(Busy) 12   // ePaper Busy indicator (SPI MISO aquivalent)
+    RST 26          // ePaper Reset switch
+    DC 27           // ePaper Data/Command selection
+    CS(SS) 15       // SPI Channel Chip Selection for ePaper
+    SCK(CLK) 14     // SPI Channel Click
+    MOSI(DIN) 13    // SPI Channel MOSI Pin
+    ******************************/
 
-    init_type = type;
-    if ((type == PCD8544) || (type == SSD1306) || (type == SH1106))
+    BUSY_PIN = 12;
+    RST_PIN = 26;
+    DC_PIN = 27;
+    CS_PIN = 15;
+    CLK_PIN = 14;
+    MOSI_PIN = 13;
+
+    _type = ePaper154;
+
+    init_type = _type;
+    if ((_type == PCD8544) || (_type == SSD1306) || (_type == SH1106))
     {
         Serial.println("Initialize Mono ");
-        DisplayMono.init(type, _data, _clk, _cs, _dc, _reset);
+        DisplayMono.init(_type, MOSI_PIN, CLK_PIN, CS_PIN, DC_PIN, RST_PIN);
         DisplayMono.enablePowerSafe = enablePowerSafe;
         DisplayMono.enableScreensaver = enableScreensaver;
         DisplayMono.contrast = contrast;
         Serial.println("Initialize Mono done");
         _period = 1000;
     }
-    else if ((type == ePaper154) || (type == ePaper27))
+    else if ((_type == ePaper154) || (_type == ePaper27))
     {
-        // #define EPD_SID 32 // a.k.a. as MOSI ("Master Out Slave In") or DIN on the Waveshare module
-        // #define EPD_CLK 25
-
-        // MISO(Busy) 12
-        // RST 34
-        // DC 27
-        // CS(SS) 33
-        // SCK(CLK) 14
-        // MOSI(DIN) 13
-
         Serial.println("Initialize ePaper ");
-        DisplayEPaper.init(type, _cs, _dc, _reset, _busy, _clk, _data); // Type, CS, DC, RST, BUSY, SCK, MOSI
+        DisplayEPaper.init(_type, CS_PIN, DC_PIN, RST_PIN, BUSY_PIN, CLK_PIN, MOSI_PIN); // Type, CS, DC, RST, BUSY, SCK, MOSI
         Serial.println("Initialize ePaper done");
         _period = 10000;
     }
