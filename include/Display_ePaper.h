@@ -18,9 +18,9 @@
 #include <GxEPD2_3C.h>
 // FreeFonts from Adafruit_GFX
 #include <Fonts/FreeSans9pt7b.h>
-#include <Fonts/FreeMonoBold12pt7b.h>
-#include <Fonts/FreeMonoBold18pt7b.h>
-#include <Fonts/FreeMonoBold24pt7b.h>
+#include <Fonts/FreeSans12pt7b.h>
+#include <Fonts/FreeSans18pt7b.h>
+#include <Fonts/FreeSans24pt7b.h>
 
 #include "imagedata.h"
 #include "Display.h"
@@ -37,16 +37,17 @@ public:
     void loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod);
 
 private:
-    void printText(const char *text, uint8_t line);
+    void headlineIP();
+    void actualPowerPaged(float totalPower, float totalYieldDay, float totalYieldTotal);
+    void lastUpdatePaged();
+
+    bool _changed = false;
+    char _fmtText[32];
+
+    uint16_t headline_tbh = 13;
+    uint16_t actualP_tbh = 75;
 
     GxEPD2_GFX *_display;
-
-    DisplayType_t _typeEPaper;
-    uint8_t _mExtra;
-    uint32_t _lastDisplayUpdate = 0;
-    float totalPowerSum;
-    uint16_t totalSampleCount;
-    char _fmtText[32];
 };
 
 extern DisplayEPaperClass DisplayEPaper;

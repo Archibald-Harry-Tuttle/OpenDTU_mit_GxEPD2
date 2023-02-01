@@ -23,11 +23,9 @@ private:
 
     U8G2 *_display;
 
-    DisplayType_t _display_type = DisplayType_t::None;
     uint8_t _mExtra;
     uint16_t _dispY = 0;
     uint16_t _interval = 60000; // interval at which to power save (milliseconds)
-    uint32_t _lastDisplayUpdate = 0;
     uint32_t _previousMillis = 0;
     char _fmtText[32];
 };

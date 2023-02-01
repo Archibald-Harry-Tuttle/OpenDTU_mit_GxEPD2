@@ -6,25 +6,26 @@
 
 void DisplayClass::init(DisplayType_t _type, uint8_t MOSI_PIN, uint8_t CLK_PIN, uint8_t CS_PIN, uint8_t DC_PIN, uint8_t RST_PIN, uint8_t BUSY_PIN)
 {
-    /*************** HSPI Belegung:
+    /*************** HSPI Belegung *******************************
     MISO(Busy) 12   // ePaper Busy indicator (SPI MISO aquivalent)
     RST 26          // ePaper Reset switch
     DC 27           // ePaper Data/Command selection
     CS(SS) 15       // SPI Channel Chip Selection for ePaper
     SCK(CLK) 14     // SPI Channel Click
     MOSI(DIN) 13    // SPI Channel MOSI Pin
-    ******************************/
+    *************************************************************/
 
+    /************ Testdefinition start ***********/
+    _type = ePaper154;
     BUSY_PIN = 12;
     RST_PIN = 26;
     DC_PIN = 27;
     CS_PIN = 15;
     CLK_PIN = 14;
     MOSI_PIN = 13;
+    /************ Testdefinition ende ***********/
 
-    _type = ePaper154;
-
-    init_type = _type;
+    _display_type = _type;
     if ((_type == PCD8544) || (_type == SSD1306) || (_type == SH1106))
     {
         Serial.println("Initialize Mono ");
@@ -46,7 +47,7 @@ void DisplayClass::init(DisplayType_t _type, uint8_t MOSI_PIN, uint8_t CLK_PIN, 
 
 void DisplayClass::loop()
 {
-    if (init_type == DisplayType_t::None)
+    if (_display_type == DisplayType_t::None)
     {
         return;
     }
@@ -77,7 +78,7 @@ void DisplayClass::loop()
             totalYieldTotal += (inv->Statistics()->getChannelFieldValue(CH0, FLD_YT));
         }
 
-        if ((init_type == PCD8544) || (init_type == SSD1306) || (init_type == SH1106))
+        if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106))
         {
             DisplayMono.loop(totalPower, totalYieldDay, totalYieldTotal, isprod);
         }

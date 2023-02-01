@@ -26,7 +26,7 @@ public:
     uint32_t _lastDisplayUpdate = 0;
 
 private:
-    DisplayType_t init_type;
+    DisplayType_t _display_type = DisplayType_t::None;
 };
 
 extern DisplayClass Display;

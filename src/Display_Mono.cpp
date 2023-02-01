@@ -25,10 +25,9 @@ DisplayMonoClass::~DisplayMonoClass()
 
 void DisplayMonoClass::init(DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t dc, uint8_t reset)
 {
-    _display_type = type;
-    if (_display_type > DisplayType_t::None)
+    if (type > DisplayType_t::None)
     {
-        auto constructor = mono_types[_display_type];
+        auto constructor = mono_types[type];
         _display = constructor(reset, clk, data, cs);
         _display->begin();
     }
@@ -98,24 +97,10 @@ void DisplayMonoClass::printText(const char *text, uint8_t line)
 
 void DisplayMonoClass::loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod)
 {
-    if (_display_type == DisplayType_t::None)
-    {
-        return;
-    }
-
     _display->clearBuffer();
 
     // set Contrast of the Display to raise the lifetime
     _display->setContrast(contrast);
-
-    //=====> Logo and Lighting ==========
-    //   pxMovement +x (0 - 6 px)
-    uint8_t ex = enableScreensaver ? (_mExtra % 7) : 0;
-    if (isprod > 0)
-    {
-        //_display->drawXBMP(5 + ex, 1, 8, 17, bmp_arrow);
-    }
-    //<=======================
 
     //=====> Actual Production ==========
     if ((totalPower > 0) && (isprod > 0))
@@ -123,7 +108,7 @@ void DisplayMonoClass::loop(float totalPower, float totalYieldDay, float totalYi
         _display->setPowerSave(false);
         if (totalPower > 999)
         {
-            snprintf(_fmtText, sizeof(_fmtText), "%2.1f kW", (totalPower / 1000));
+            snprintf(_fmtText, sizeof(_fmtText), "%2.2f kW", (totalPower / 1000));
         }
         else
         {

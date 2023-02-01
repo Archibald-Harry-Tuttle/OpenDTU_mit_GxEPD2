@@ -1,5 +1,4 @@
 #include "Display_ePaper.h"
-#include <Hoymiles.h>
 #include <NetworkSettings.h>
 #include "imagedata.h"
 
@@ -29,7 +28,6 @@ DisplayEPaperClass::~DisplayEPaperClass()
 
 void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY, uint8_t _SCK, uint8_t _MOSI)
 {
-    _typeEPaper = type;
     if (type > DisplayType_t::None)
     {
         Serial.begin(115200);
@@ -44,6 +42,7 @@ void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint
         _display->setRotation(2);
         _display->setTextColor(GxEPD_BLACK);
         _display->setFullWindow();
+        _display->setFont(&FreeSans9pt7b);
 
         // Logo
         _display->fillScreen(GxEPD_BLACK);
@@ -57,47 +56,104 @@ void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint
         while (_display->nextPage())
             ;
 
+        // Wifi Status ausgeben
+        headlineIP();
         Serial.println("Display initializiert: ");
     }
 }
 //***************************************************************************
-void DisplayEPaperClass::loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod)
+void DisplayEPaperClass::headlineIP()
 {
-    if (_typeEPaper == DisplayType_t::None)
-    {
-        return;
-    }
+    _display->setFont(&FreeSans9pt7b);
 
-    // Berechnen des Mittelwerts
-
-    //_display->setPartialWindow(0, 0, _display->width(), 30); // definieren Sie das partielle Fenster für die Anzeige des Werts
-    //_display->fillScreen(GxEPD_WHITE); // Löschen Sie den vorherigen Wert
-    // Anzeige auf dem Display
-
-    _display->firstPage();
+    _display->setTextColor(GxEPD_WHITE);
+    _display->setPartialWindow(0, 0, _display->width(), headline_tbh + 3);
     do
     {
-        _display->setTextSize(4);
-        snprintf(_fmtText, sizeof(_fmtText), "%.0f W", totalPower);
-        //_display->drawBitmap(10, 10, bmp_arrow, 20, 20, GxEPD_WHITE);
-        _display->println(_fmtText);
-        _display->setTextSize(3);
-        _display->println();
-        // Heutige Produktion
-        _display->println("today:");
-        snprintf(_fmtText, sizeof(_fmtText), "%.0f Wh", totalYieldDay);
-        _display->println(_fmtText);
-        // Gesamt Produktion
-        _display->println("total:");
-        snprintf(_fmtText, sizeof(_fmtText), "%.1f kWh", totalYieldTotal);
-        _display->println(_fmtText);
-        _display->setTextSize(2);
-        _display->println();
-        // IP-Adresse
-        _display->println("IP-Adresse:");
-        _display->println(NetworkSettings.localIP().toString().c_str());
+        _display->fillScreen(GxEPD_BLACK);
+        _display->setCursor(0, headline_tbh + 1);
+        if (NetworkSettings.isConnected() == true)
+        {
+            snprintf(_fmtText, sizeof(_fmtText), "IP: %s", NetworkSettings.localIP().toString().c_str());
+            _display->println(_fmtText);
+        }
+        else
+        {
+            _display->println("Wifi nicht verbunden");
+        }
     } while (_display->nextPage());
-    _lastDisplayUpdate = millis();
+}
+
+void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDay, float _totalYieldTotal)
+{
+    _changed = true;
+    _display->setFont(&FreeSans24pt7b);
+
+    _display->setTextColor(GxEPD_BLACK);
+    _display->setPartialWindow(0, headline_tbh + 3, _display->width(), _display->height() - (headline_tbh * 2 + 6));
+    do
+    {
+        _display->fillScreen(GxEPD_WHITE);
+        _display->setCursor(10, actualP_tbh - 10);
+        if (_totalPower > 9999)
+        {
+            snprintf(_fmtText, sizeof(_fmtText), "%.1f kW", (_totalPower / 10000));
+        }
+        else if ((_totalPower > 0) && (_totalPower <= 9999))
+        {
+            snprintf(_fmtText, sizeof(_fmtText), "%.0f W", _totalPower);
+        }
+        else
+        {
+            snprintf(_fmtText, sizeof(_fmtText), "Offline");
+        }
+        _display->println(_fmtText);
+
+        _display->setFont(&FreeSans12pt7b);
+        snprintf(_fmtText, sizeof(_fmtText), "today: %4.0f Wh", _totalYieldDay);
+        _display->println(_fmtText);
+
+        snprintf(_fmtText, sizeof(_fmtText), "total: %.1f kWh", _totalYieldTotal);
+        _display->println(_fmtText);
+
+    } while (_display->nextPage());
+}
+
+void DisplayEPaperClass::lastUpdatePaged()
+{
+    _display->setFont(&FreeSans9pt7b);
+
+    _display->setTextColor(GxEPD_WHITE);
+    _display->setPartialWindow(0, _display->height() - (headline_tbh + 3), _display->width(), headline_tbh + 3);
+    do
+    {
+        _display->fillScreen(GxEPD_BLACK);
+        _display->setCursor(0, _display->height() - 3);
+
+        time_t now = time(nullptr);
+        strftime(_fmtText, sizeof(_fmtText), "%a %d.%m.%Y %H:%M", localtime(&now));
+        _display->println(_fmtText);
+
+    } while (_display->nextPage());
+}
+
+void DisplayEPaperClass::loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod)
+{
+    if (NetworkSettings.isConnected() == true)
+    {
+        _changed = true;
+        headlineIP();
+    }
+
+    actualPowerPaged(totalPower, totalYieldDay, totalYieldTotal);
+
+    // if ((isprod > 0) && (_changed))
+    //{
+    _changed = false;
+    lastUpdatePaged();
+    //}
+
+    _display->powerOff();
 }
 
 DisplayEPaperClass DisplayEPaper;
