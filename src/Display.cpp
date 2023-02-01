@@ -6,10 +6,19 @@
 
 void DisplayClass::init(DisplayType_t type, uint8_t _data, uint8_t _clk, uint8_t _cs, uint8_t _dc, uint8_t _reset, uint8_t _busy)
 {
+    // CS(SS) 33
+    // DC 27
+    // RST 34
+    // MISO(Busy) 12
+    // SCK(CLK) 14
+    // MOSI(DIN) 13
+
+    //CS: 33 / DC: 27 / RST: 4 / BUSY: 14 / CLK: 25 / MOSI: 32
+
     type = ePaper154;
     _cs = 33;
     _dc = 27;
-    _reset = 34;
+    _reset = 4;
     _busy = 14;
     _clk = 25;
     _data = 32;
@@ -29,14 +38,6 @@ void DisplayClass::init(DisplayType_t type, uint8_t _data, uint8_t _clk, uint8_t
     {
         // #define EPD_SID 32 // a.k.a. as MOSI ("Master Out Slave In") or DIN on the Waveshare module
         // #define EPD_CLK 25
-
-        // MISO(Busy) 12
-        // RST 34
-        // DC 27
-        // CS(SS) 33
-        // SCK(CLK) 14
-        // MOSI(DIN) 13
-
         Serial.println("Initialize ePaper ");
         DisplayEPaper.init(type, _cs, _dc, _reset, _busy, _clk, _data); // Type, CS, DC, RST, BUSY, SCK, MOSI
         Serial.println("Initialize ePaper done");
