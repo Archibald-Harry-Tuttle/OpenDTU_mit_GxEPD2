@@ -64,6 +64,7 @@ void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint
 //***************************************************************************
 void DisplayEPaperClass::headlineIP()
 {
+    _changed = true;
     _display->setFont(&FreeSans9pt7b);
 
     _display->setTextColor(GxEPD_WHITE);
@@ -141,17 +142,16 @@ void DisplayEPaperClass::loop(float totalPower, float totalYieldDay, float total
 {
     if (NetworkSettings.isConnected() == true)
     {
-        _changed = true;
         headlineIP();
     }
 
     actualPowerPaged(totalPower, totalYieldDay, totalYieldTotal);
 
-    // if ((isprod > 0) && (_changed))
-    //{
-    _changed = false;
-    lastUpdatePaged();
-    //}
+    if ((isprod > 0) && (_changed))
+    {
+        _changed = false;
+        lastUpdatePaged();
+    }
 
     _display->powerOff();
 }
