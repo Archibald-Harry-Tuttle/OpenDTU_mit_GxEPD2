@@ -43,9 +43,7 @@ private:
 
     bool _changed = false;
     char _fmtText[32];
-
     uint16_t headline_tbh = 13;
-    uint16_t actualP_tbh = 75;
 
     GxEPD2_GFX *_display;
 };
