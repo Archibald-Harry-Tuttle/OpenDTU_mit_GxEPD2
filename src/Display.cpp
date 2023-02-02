@@ -38,10 +38,12 @@ void DisplayClass::init(DisplayType_t _type, uint8_t MOSI_PIN, uint8_t CLK_PIN, 
     }
     else if ((_type == ePaper154) || (_type == ePaper27))
     {
+#if defined(ESP32)
         Serial.println("Initialize ePaper ");
         DisplayEPaper.init(_type, CS_PIN, DC_PIN, RST_PIN, BUSY_PIN, CLK_PIN, MOSI_PIN); // Type, CS, DC, RST, BUSY, SCK, MOSI
         Serial.println("Initialize ePaper done");
         _period = 10000;
+#endif
     }
 }
 
@@ -84,7 +86,9 @@ void DisplayClass::loop()
         }
         else
         {
+#if defined(ESP32)
             DisplayEPaper.loop(totalPower, totalYieldDay, totalYieldTotal, isprod);
+#endif
         }
         _lastDisplayUpdate = millis();
     }

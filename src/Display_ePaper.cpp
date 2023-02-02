@@ -2,7 +2,7 @@
 #include <NetworkSettings.h>
 #include "imagedata.h"
 
-static const int spiClk = 1000000; // 1 MHz
+static const uint32_t spiClk = 4000000; // 4 MHz
 
 #if defined(ESP32) && defined(USE_HSPI_FOR_EPD)
 SPIClass hspi(HSPI);
@@ -36,7 +36,7 @@ void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint
         hspi.begin(_SCK, _BUSY, _MOSI, _CS);
 
 #if defined(ESP32) && defined(USE_HSPI_FOR_EPD)
-        _display->epd2.selectSPI(hspi, SPISettings(4000000, MSBFIRST, SPI_MODE0));
+        _display->epd2.selectSPI(hspi, SPISettings(spiClk, MSBFIRST, SPI_MODE0));
 #endif
         _display->init(115200, true, 2, false);
         _display->setRotation(2);
@@ -56,8 +56,6 @@ void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint
         while (_display->nextPage())
             ;
 
-        // Wifi Status ausgeben
-        headlineIP();
         Serial.println("Display initializiert: ");
     }
 }
@@ -79,7 +77,7 @@ void DisplayEPaperClass::headlineIP()
         }
         else
         {
-            _display->println("Wifi nicht verbunden");
+            _display->println("WiFi not connected");
         }
     } while (_display->nextPage());
 }
