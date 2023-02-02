@@ -13,7 +13,7 @@ std::map<DisplayType_t, std::function<GxEPD2_GFX *(uint8_t, uint8_t, uint8_t, ui
     {DisplayType_t::ePaper154, [](uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY)
      { return new GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT>(GxEPD2_150_BN(_CS, _DC, _RST, _BUSY)); }},
     // GDEW027C44   2.7 " b/w/r 176x264, IL91874
-    {DisplayType_t::ePaper27, [](uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY)
+    {DisplayType_t::ePaper270, [](uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY)
      { return new GxEPD2_3C<GxEPD2_270c, GxEPD2_270c::HEIGHT>(GxEPD2_270c(_CS, _DC, _RST, _BUSY)); }},
 };
 

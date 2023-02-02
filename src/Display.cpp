@@ -36,7 +36,7 @@ void DisplayClass::init(DisplayType_t _type, uint8_t MOSI_PIN, uint8_t CLK_PIN, 
         Serial.println("Initialize Mono done");
         _period = 1000;
     }
-    else if ((_type == ePaper154) || (_type == ePaper27))
+    else if ((_type == ePaper154) || (_type == ePaper270))
     {
 #if defined(ESP32)
         Serial.println("Initialize ePaper ");

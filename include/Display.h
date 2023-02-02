@@ -10,7 +10,7 @@ enum DisplayType_t
     SSD1306,
     SH1106,
     ePaper154,
-    ePaper27
+    ePaper270
 };
 
 class DisplayClass
