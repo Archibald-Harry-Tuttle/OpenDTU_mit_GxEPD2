@@ -43,6 +43,7 @@ private:
 
     bool _changed = false;
     char _fmtText[32];
+    const char *_settedIP;
     uint16_t headline_tbh = 13;
 
     GxEPD2_GFX *_display;

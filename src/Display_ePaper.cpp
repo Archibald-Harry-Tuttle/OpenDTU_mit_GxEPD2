@@ -64,7 +64,6 @@ void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint
 //***************************************************************************
 void DisplayEPaperClass::headlineIP()
 {
-    _changed = true;
     _display->setFont(&FreeSans9pt7b);
 
     _display->setTextColor(GxEPD_WHITE);
@@ -87,7 +86,6 @@ void DisplayEPaperClass::headlineIP()
 
 void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDay, float _totalYieldTotal)
 {
-    _changed = true;
     _display->setFont(&FreeSans24pt7b);
 
     _display->setTextColor(GxEPD_BLACK);
@@ -99,10 +97,12 @@ void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDa
         if (_totalPower > 9999)
         {
             snprintf(_fmtText, sizeof(_fmtText), "%.1f kW", (_totalPower / 10000));
+            _changed = true;
         }
         else if ((_totalPower > 0) && (_totalPower <= 9999))
         {
             snprintf(_fmtText, sizeof(_fmtText), "%.0f W", _totalPower);
+            _changed = true;
         }
         else
         {
@@ -111,7 +111,7 @@ void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDa
         _display->println(_fmtText);
 
         _display->setFont(&FreeSans12pt7b);
-        snprintf(_fmtText, sizeof(_fmtText), "today: %4.0f Wh", _totalYieldDay);
+        snprintf(_fmtText, sizeof(_fmtText), "today: %.0f Wh", _totalYieldDay);
         _display->println(_fmtText);
 
         snprintf(_fmtText, sizeof(_fmtText), "total: %.1f kWh", _totalYieldTotal);
@@ -132,7 +132,7 @@ void DisplayEPaperClass::lastUpdatePaged()
         _display->setCursor(0, _display->height() - 3);
 
         time_t now = time(nullptr);
-        strftime(_fmtText, sizeof(_fmtText), "%a %d.%m.%Y %H:%M", localtime(&now));
+        strftime(_fmtText, sizeof(_fmtText), "%d.%m.%Y %H:%M", localtime(&now));
         _display->println(_fmtText);
 
     } while (_display->nextPage());
@@ -140,13 +140,18 @@ void DisplayEPaperClass::lastUpdatePaged()
 
 void DisplayEPaperClass::loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod)
 {
-    if (NetworkSettings.isConnected() == true)
+    // check if the IP has changed
+    if (_settedIP != NetworkSettings.localIP().toString().c_str())
     {
+        // save the new IP and call the Headline Funktion to adapt the Headline
+        _settedIP = NetworkSettings.localIP().toString().c_str();
         headlineIP();
     }
 
+    // call the PowerPage to change the PV Power Values
     actualPowerPaged(totalPower, totalYieldDay, totalYieldTotal);
 
+    // if there was an change and the Inverter is producing set a new Timestam in the footline
     if ((isprod > 0) && (_changed))
     {
         _changed = false;
