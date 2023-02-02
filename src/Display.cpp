@@ -42,7 +42,7 @@ void DisplayClass::init(DisplayType_t _type, uint8_t MOSI_PIN, uint8_t CLK_PIN, 
         Serial.println("Initialize ePaper ");
         DisplayEPaper.init(_type, CS_PIN, DC_PIN, RST_PIN, BUSY_PIN, CLK_PIN, MOSI_PIN); // Type, CS, DC, RST, BUSY, SCK, MOSI
         Serial.println("Initialize ePaper done");
-        _period = 30000;  // Achtung, max 65535
+        _period = 10000; // Achtung, max 65535
 #endif
     }
 }
